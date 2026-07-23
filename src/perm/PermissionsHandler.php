@@ -91,6 +91,9 @@ final class PermissionsHandler{
 		"essentialsz.kit.others" => "Allows giving kits to other players",
 		"essentialsz.kit.admin" => "Allows access to the kit admin UI",
 		"essentialsz.kit.exemptdelay" => "Bypasses kit cooldowns",
+		"essentialsz.time" => "Allows access to the /time command",
+		"essentialsz.time.set" => "Allows changing the world time",
+		"essentialsz.time.world.all" => "Allows changing the time in every world",
 		"essentialsz.category" => "Allows viewing every kit category"
 	];
 

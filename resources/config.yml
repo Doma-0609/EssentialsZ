@@ -60,6 +60,11 @@ max-walk-speed: 0.4
 # Should /heal also remove all active potion effects?
 remove-effects-on-heal: true
 
+# Should /time require a per-world permission to change the time?
+# When true, changing a world needs essentialsz.time.world.<world> (spaces
+# become underscores) or essentialsz.time.world.all.
+world-time-permissions: false
+
 # The fake quit and join broadcasts sent when a player vanishes and
 # unvanishes. Set to "none" to use the server's own quit/join format.
 # Placeholders: {PLAYER} is the display name, {USERNAME} the real name.

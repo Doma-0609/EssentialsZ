@@ -30,6 +30,8 @@ interface ISettings{
 
 	public function isRemovingEffectsOnHeal() : bool;
 
+	public function isWorldTimePermissions() : bool;
+
 	public function getVanishFakeQuitMessage() : ?string;
 
 	public function getVanishFakeJoinMessage() : ?string;
