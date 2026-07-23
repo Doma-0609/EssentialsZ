@@ -1,0 +1,180 @@
+############################################################
+# +------------------------------------------------------+ #
+# |                       Notes                          | #
+# +------------------------------------------------------+ #
+############################################################
+
+# EssentialsZ - the essential plugin suite for PocketMine-MP.
+
+############################################################
+# +------------------------------------------------------+ #
+# |                    Essentials (Global)               | #
+# +------------------------------------------------------+ #
+############################################################
+
+# The message locale for all messages.
+# Bundled locales: en, fa
+# Files live in plugin_data/EssentialsZ/messages/messages_<locale>.properties
+locale: en
+
+# Should players see EssentialsZ messages in the language of their own
+# game client, when a matching messages file exists?
+# When false, everybody gets the locale configured above.
+per-player-locale: false
+
+# Turn on debug mode for verbose logging.
+# This can also be toggled at runtime with /essentials debug.
+debug: false
+
+# When a command is used with wrong arguments, should EssentialsZ show
+# the full multi-line command help (usages + descriptions)?
+# When false, only a single short usage line is shown.
+verbose-command-usages: true
+
+# Commands removed from the server once everything has loaded.
+# Including EssentialsZ's own commands.
+# Removing a command also removes all of its aliases, so listing "gamemode"
+# takes /gm, /gmc and the rest with it. A leading slash is optional.
+disabled-commands:
+  - me
+  - about
+  - ver
+  - version
+  - etc
+
+############################################################
+# +------------------------------------------------------+ #
+# |                       Players                        | #
+# +------------------------------------------------------+ #
+############################################################
+
+# The maximum fly speed /speed may set, in engine units.
+# The engine default fly speed is 0.05; /speed 10 reaches this cap.
+# Players with essentialsz.speed.bypass ignore the cap.
+max-fly-speed: 0.4
+
+# The maximum walk speed /speed may set, in engine units.
+# The engine default walk speed is 0.1; /speed 10 reaches this cap.
+max-walk-speed: 0.4
+
+# Should /heal also remove all active potion effects?
+remove-effects-on-heal: true
+
+# The fake quit and join broadcasts sent when a player vanishes and
+# unvanishes. Set to "none" to use the server's own quit/join format.
+# Placeholders: {PLAYER} is the display name, {USERNAME} the real name.
+# Color codes are written with & (for example &e).
+vanish-fake-quit-message: "none"
+vanish-fake-join-message: "none"
+
+############################################################
+# +------------------------------------------------------+ #
+# |                      Teleports                       | #
+# +------------------------------------------------------+ #
+############################################################
+
+# After how many seconds should a /tpa or /tpahere request time out?
+# Set to 0 to keep requests forever.
+tpa-accept-cancellation: 120
+
+# For how many seconds after dying can /back return a player to their
+# last death location? Set to 0 for no time limit.
+back-death-time-limit: 300
+
+# How many named homes can a player set with /sethome?
+# Players with essentialsz.sethome.multiple.unlimited ignore this limit.
+max-homes: 3
+
+# /tpr (random teleport) settings. Distances are measured in blocks
+# from the world spawn point.
+random-teleport:
+  min-range: 250
+  max-range: 1000
+  attempts: 10
+
+############################################################
+# +------------------------------------------------------+ #
+# |                       Economy                        | #
+# +------------------------------------------------------+ #
+############################################################
+
+economy:
+  # Master switch. When false, the economy module does not exist at
+  # runtime: no /balance, /pay, /balancetop or /eco commands, no
+  # essentialsz.balance/pay/balancetop/eco permissions and no listeners -
+  # use this when another economy plugin runs on the server. Changing it
+  # requires a restart. Balances are stored through the storage provider
+  # below, alongside the rest of each player's data.
+  enabled: true
+
+  # The balance a new account starts with.
+  start-money: 1000
+
+  # The maximum balance an account can hold.
+  max-money: 10000000000
+
+  # Currency display, e.g. "$1,234.50". decimals also controls rounding
+  # of every transaction.
+  currency-symbol: "$"
+  decimals: 2
+
+  # May players /pay someone who is offline (their account must exist)?
+  allow-pay-offline: true
+
+  # The smallest amount /pay accepts. 0 disables the minimum.
+  min-pay-amount: 0
+
+############################################################
+# +------------------------------------------------------+ #
+# |                  Right-to-left text                  | #
+# +------------------------------------------------------+ #
+############################################################
+
+rtl:
+  # Master switch for right-to-left (Persian, Arabic, Hebrew) text support.
+  # Bedrock renders right-to-left runs backwards; when this is on, outgoing
+  # text is rewritten so it reads correctly on the client.
+  # When false the module does not exist at runtime: no processor and no
+  # listener are registered. Changing it requires a restart.
+  # when enabled, it checks all packets and search for texts
+  # idk but it may cause some performance issue?
+  # credit to https://github.com/meemfe/RTL
+  enabled: false
+
+  # Reshape Persian/Arabic letters into their joined forms. Turn this off to
+  # only flip the text order, leaving letter shapes as typed.
+  shape: true
+
+############################################################
+# +------------------------------------------------------+ #
+# |                     Player Data                      | #
+# +------------------------------------------------------+ #
+############################################################
+
+# All persistent player data - homes, money, kit cooldowns, timestamps,
+# past usernames - is kept in ONE record per player.
+storage:
+  # Where those records live:
+  #   json   - plugin_data/EssentialsZ/players/<key>.json (one file each)
+  #   sqlite - plugin_data/EssentialsZ/storage/players.sqlite3
+  #   mysql  - the MySQL server configured below
+  # Switching providers does NOT migrate existing data.
+  provider: json
+
+  # Only used when provider is mysql.
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    username: root
+    password: ""
+    database: essentialsz
+    table: players
+
+# Which identifier keys each player's record:
+#   name - lowercased, trimmed player name ("DOMA 0609" -> "doma 0609")
+#   uuid - the player's UUID
+#   xuid - the player's Xbox user id (falls back to the name key when a
+#          player has no XUID, e.g. on servers with xbox-auth disabled)
+# Changing this on a live server does NOT migrate existing records.
+# Economy can only reach OFFLINE players by name while this is "name".
+user-storage-key: name
