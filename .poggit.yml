@@ -1,0 +1,11 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/Doma-0609/EssentialsZ
+build-by-default: true
+branches:
+- main
+projects:
+  EssentialsZ:
+    path: ""
+    libs:
+      - src: jojoe77777/FormAPI/libFormAPI
+        version: ^2.1.1
+...
