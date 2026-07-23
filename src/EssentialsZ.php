@@ -41,6 +41,7 @@ use Doma\EssentialsZ\commands\Commandtp;
 use Doma\EssentialsZ\commands\Commandtpa;
 use Doma\EssentialsZ\commands\Commandtpaccept;
 use Doma\EssentialsZ\commands\Commandtpahere;
+use Doma\EssentialsZ\commands\Commandtime;
 use Doma\EssentialsZ\commands\Commandtpdeny;
 use Doma\EssentialsZ\commands\Commandtphere;
 use Doma\EssentialsZ\commands\Commandtpo;
@@ -230,7 +231,8 @@ class EssentialsZ extends PluginBase implements IEssentials{
 			[new Commandtpo(), ["etpo"]],
 			[new Commandsetwarp(), ["createwarp", "ecreatewarp", "esetwarp"]],
 			[new Commanddelwarp(), ["edelwarp", "remwarp", "eremwarp", "rmwarp", "ermwarp"]],
-			[new Commandkit(), ["kits", "ekit", "ekits"]]
+			[new Commandkit(), ["kits", "ekit", "ekits"]],
+			[new Commandtime(), ["etime", "day", "eday", "night", "enight"]]
 		];
 
 		if($this->economy !== null){
