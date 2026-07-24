@@ -48,10 +48,6 @@ final class RtlListener implements Listener{
 
     private function correctFormPacket(ModalFormRequestPacket $packet) : void{
         $raw = $packet->formData;
-        if($raw === "" || !$this->processor->hasRtl($raw)){
-            return;
-        }
-
         $data = json_decode($raw, true);
         if(!is_array($data)){
             return;
