@@ -15,7 +15,10 @@ namespace Doma\EssentialsZ\rtl;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\ModalFormRequestPacket;
+use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
+use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\TextPacket;
+use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 
 final class RtlListener implements Listener{
 
@@ -25,9 +28,21 @@ final class RtlListener implements Listener{
         foreach($event->getPackets() as $packet){
             if($packet instanceof TextPacket){
                 $this->correctPacket($packet);
+                return;
             }
             if($packet instanceof ModalFormRequestPacket){
                 $this->correctFormPacket($packet);
+                return;
+            }
+            if($packet instanceof SetScorePacket){
+                foreach ($packet->entries as $entry){
+                    $entry->customName = $this->processor->correct($entry->customName);
+                }
+                return;
+            }
+            if($packet instanceof SetDisplayObjectivePacket){
+                $packet->displayName = $this->processor->correct($packet->displayName);
+                return;
             }
         }
     }
