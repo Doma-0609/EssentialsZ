@@ -17,6 +17,7 @@ use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\ModalFormRequestPacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
+use pocketmine\network\mcpe\protocol\SetTitlePacket;
 use pocketmine\network\mcpe\protocol\TextPacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 
@@ -42,6 +43,10 @@ final class RtlListener implements Listener{
             }
             if($packet instanceof SetDisplayObjectivePacket){
                 $packet->displayName = $this->processor->correct($packet->displayName);
+                return;
+            }
+            if($packet instanceof SetTitlePacket){
+                $packet->text = $this->processor->correct($packet->text);
                 return;
             }
         }
