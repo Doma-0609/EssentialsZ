@@ -28,7 +28,7 @@ class Commandtpo extends EssentialsCommand{
 			case 0:
 				throw new NotEnoughArgumentsException();
 			case 1:
-				$player = $this->getPlayerOverride($server, $args[0]);
+				$player = $this->getPlayerOverride($user, $server, $args[0]);
 				$user->getBase()->teleport($player->getBase()->getLocation());
 				break;
 			default:
@@ -36,15 +36,39 @@ class Commandtpo extends EssentialsCommand{
 					&& !$user->isAuthorized(DefaultPermissionNames::COMMAND_TELEPORT_OTHER)){
 					throw new TranslatableException("noPerm", "essentialsz.tp.others");
 				}
-				$target = $this->getPlayerOverride($server, $args[0]);
-				$toPlayer = $this->getPlayerOverride($server, $args[1]);
-				$target->getBase()->teleport($toPlayer->getBase()->getLocation());
-				$target->sendTl("teleportAtoB", $user->getDisplayName(), $toPlayer->getDisplayName());
+				$toPlayer = $this->getPlayerOverride($user, $server, $args[1]);
+				foreach($this->overrideTargets($user, $server, $args[0]) as $target){
+					$target->getBase()->teleport($toPlayer->getBase()->getLocation());
+					$target->sendTl("teleportAtoB", $user->getDisplayName(), $toPlayer->getDisplayName());
+				}
 				break;
 		}
 	}
 
-	private function getPlayerOverride(Server $server, string $searchTerm) : User{
+	/**
+	 * Like matchTargets(), but a plain name reaches vanished players too.
+	 *
+	 * @return list<User>
+	 */
+	private function overrideTargets(User $user, Server $server, string $searchTerm) : array{
+		$selected = $this->resolveSelector($user->getSource(), $searchTerm);
+		if($selected !== null){
+			if($selected === []){
+				throw new PlayerNotFoundException();
+			}
+			return $selected;
+		}
+		return [$this->getPlayerOverride($user, $server, $searchTerm)];
+	}
+
+	private function getPlayerOverride(User $user, Server $server, string $searchTerm) : User{
+		$selected = $this->resolveSelector($user->getSource(), $searchTerm);
+		if($selected !== null){
+			if($selected === []){
+				throw new PlayerNotFoundException();
+			}
+			return $selected[0];
+		}
 		$player = $server->getPlayerExact($searchTerm) ?? $server->getPlayerByPrefix($searchTerm);
 		if($player === null){
 			throw new PlayerNotFoundException();

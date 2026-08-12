@@ -18,6 +18,8 @@ use Doma\EssentialsZ\IEssentials;
 use Doma\EssentialsZ\session\User;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use function array_map;
+use function array_rand;
 use function count;
 use function implode;
 use function is_numeric;
@@ -25,6 +27,7 @@ use function preg_replace_callback;
 use function str_replace;
 use function str_starts_with;
 use function stripos;
+use function strtolower;
 use function substr;
 
 abstract class EssentialsCommand implements IEssentialsCommand{
@@ -124,12 +127,102 @@ abstract class EssentialsCommand implements IEssentialsCommand{
 	 * nobody matches.
 	 */
 	protected function getPlayer(Server $server, CommandSource $sender, string $searchTerm) : User{
+		$selected = $this->resolveSelector($sender, $searchTerm);
+		if($selected !== null){
+			if($selected === []){
+				throw new PlayerNotFoundException();
+			}
+			return $selected[0];
+		}
 		$exact = $server->getPlayerExact($searchTerm);
 		$player = $exact ?? $server->getPlayerByPrefix($searchTerm);
 		if($player === null || !$this->canInteract($sender, $player)){
 			throw new PlayerNotFoundException();
 		}
 		return $this->ess->getUser($player);
+	}
+
+	/**
+	 * Every user a target selector or name matches (a plain name matches one).
+	 *
+	 * @return list<User>
+	 * @throws PlayerNotFoundException when nothing matches
+	 */
+	protected function matchTargets(Server $server, CommandSource $sender, string $searchTerm) : array{
+		$selected = $this->resolveSelector($sender, $searchTerm);
+		if($selected !== null){
+			if($selected === []){
+				throw new PlayerNotFoundException();
+			}
+			return $selected;
+		}
+		return [$this->getPlayer($server, $sender, $searchTerm)];
+	}
+
+	/**
+	 * Expands a Bedrock target selector into the users it matches: @s the
+	 * sender, @a everyone, @p the nearest player, @r a random player. Returns
+	 * null when $term is not a selector, or an empty list when it matched
+	 * nobody. Vanished players the sender cannot see are excluded.
+	 *
+	 * @return list<User>|null
+	 */
+	protected function resolveSelector(CommandSource $sender, string $term) : ?array{
+		switch(strtolower($term)){
+			case "@s":
+				$self = $sender->getUser();
+				return $self !== null ? [$self] : [];
+			case "@a":
+				return $this->visibleUsers($sender);
+			case "@r":
+				$users = $this->visibleUsers($sender);
+				return $users === [] ? [] : [$users[array_rand($users)]];
+			case "@p":
+				return $this->nearestUser($sender);
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * @return list<User>
+	 */
+	private function visibleUsers(CommandSource $sender) : array{
+		$users = [];
+		foreach($this->ess->getOnlineUsers() as $user){
+			if($this->canInteract($sender, $user->getBase())){
+				$users[] = $user;
+			}
+		}
+		return $users;
+	}
+
+	/**
+	 * @return list<User> the nearest player to the sender (0 or 1 entries)
+	 */
+	private function nearestUser(CommandSource $sender) : array{
+		$users = $this->visibleUsers($sender);
+		$from = $sender->getPlayer();
+		if($from === null){
+			return $users === [] ? [] : [$users[0]];
+		}
+		$best = null;
+		$bestDistance = null;
+		foreach($users as $user){
+			$player = $user->getBase();
+			if($player->getWorld() !== $from->getWorld()){
+				continue;
+			}
+			$distance = $player->getPosition()->distanceSquared($from->getPosition());
+			if($bestDistance === null || $distance < $bestDistance){
+				$bestDistance = $distance;
+				$best = $user;
+			}
+		}
+		if($best !== null){
+			return [$best];
+		}
+		return $users === [] ? [] : [$users[0]];
 	}
 
 	/**
@@ -192,6 +285,12 @@ abstract class EssentialsCommand implements IEssentialsCommand{
 	 * @return list<\pocketmine\player\Player>
 	 */
 	protected function matchPlayers(Server $server, string $searchTerm, ?CommandSource $sender = null) : array{
+		if($sender !== null){
+			$selected = $this->resolveSelector($sender, $searchTerm);
+			if($selected !== null){
+				return array_map(static fn(User $user) => $user->getBase(), $selected);
+			}
+		}
 		$exact = $server->getPlayerExact($searchTerm);
 		if($exact !== null){
 			return $this->canInteract($sender, $exact) ? [$exact] : [];

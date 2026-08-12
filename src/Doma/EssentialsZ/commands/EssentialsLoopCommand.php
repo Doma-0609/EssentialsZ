@@ -45,9 +45,12 @@ abstract class EssentialsLoopCommand extends EssentialsCommand{
 			throw new PlayerNotFoundException();
 		}
 
-		if($sender->isPlayer() && ($searchTerm === "@s" || $searchTerm === "@p")){
-			$user = $sender->getUser();
-			if($user !== null){
+		$selected = $this->resolveSelector($sender, $searchTerm);
+		if($selected !== null){
+			if($selected === []){
+				throw new PlayerNotFoundException();
+			}
+			foreach($selected as $user){
 				$userConsumer($user);
 			}
 			return;

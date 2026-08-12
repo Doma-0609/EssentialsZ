@@ -30,6 +30,7 @@ class Settings implements ISettings{
 	private float $maxWalkSpeed = 0.4;
 	private bool $removeEffectsOnHeal = true;
 	private bool $worldTimePermissions = false;
+	private bool $autoVanish = true;
 	private ?string $vanishFakeQuitMessage = null;
 	private ?string $vanishFakeJoinMessage = null;
 	private string $userStorageKey = UserStorageKey::NAME;
@@ -56,6 +57,7 @@ class Settings implements ISettings{
 		$this->maxWalkSpeed = $this->config->getDouble("max-walk-speed", 0.4);
 		$this->removeEffectsOnHeal = $this->config->getBoolean("remove-effects-on-heal", true);
 		$this->worldTimePermissions = $this->config->getBoolean("world-time-permissions", false);
+		$this->autoVanish = $this->config->getBoolean("auto-vanish", true);
 		$this->vanishFakeQuitMessage = self::parseMessageFormat($this->config->getString("vanish-fake-quit-message", "none"));
 		$this->vanishFakeJoinMessage = self::parseMessageFormat($this->config->getString("vanish-fake-join-message", "none"));
 
@@ -108,6 +110,10 @@ class Settings implements ISettings{
 
 	public function isWorldTimePermissions() : bool{
 		return $this->worldTimePermissions;
+	}
+
+	public function isAutoVanish() : bool{
+		return $this->autoVanish;
 	}
 
 	public function getVanishFakeQuitMessage() : ?string{

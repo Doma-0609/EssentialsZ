@@ -14,6 +14,7 @@ namespace Doma\EssentialsZ\commands;
 
 use Doma\EssentialsZ\session\User;
 use pocketmine\Server;
+use function count;
 
 class Commandtphere extends EssentialsCommand{
 
@@ -22,9 +23,14 @@ class Commandtphere extends EssentialsCommand{
 	}
 
 	protected function run(Server $server, User $user, string $commandLabel, array $args) : void{
-		$player = $this->getPlayerAt($server, $user->getSource(), $args, 0);
-		$player->getBase()->teleport($user->getBase()->getLocation());
-		$player->sendTl("teleporting");
+		if(count($args) === 0 || $args[0] === ""){
+			throw new NotEnoughArgumentsException();
+		}
+		// Selectors such as @a bring every matched player to you.
+		foreach($this->matchTargets($server, $user->getSource(), $args[0]) as $player){
+			$player->getBase()->teleport($user->getBase()->getLocation());
+			$player->sendTl("teleporting");
+		}
 		$user->sendTl("teleporting");
 	}
 }

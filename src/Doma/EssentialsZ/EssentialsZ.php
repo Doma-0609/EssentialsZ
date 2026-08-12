@@ -28,6 +28,9 @@ use Doma\EssentialsZ\commands\Commandgod;
 use Doma\EssentialsZ\commands\Commandheal;
 use Doma\EssentialsZ\commands\Commandhome;
 use Doma\EssentialsZ\commands\Commandkit;
+use Doma\EssentialsZ\commands\Commandland;
+use Doma\EssentialsZ\commands\Commandlandsell;
+use Doma\EssentialsZ\commands\Commandsetpos;
 use Doma\EssentialsZ\commands\Commandmystatus;
 use Doma\EssentialsZ\commands\Commandpay;
 use Doma\EssentialsZ\commands\Commandsetmoney;
@@ -52,6 +55,7 @@ use Doma\EssentialsZ\commands\Commandwarp;
 use Doma\EssentialsZ\commands\CommandDisabler;
 use Doma\EssentialsZ\commands\EssentialsPluginCommand;
 use Doma\EssentialsZ\commands\IEssentialsCommand;
+use Doma\EssentialsZ\config\ConfigUpdater;
 use Doma\EssentialsZ\config\EssentialsConfiguration;
 use Doma\EssentialsZ\economy\EconomyListener;
 use Doma\EssentialsZ\economy\EconomySettings;
@@ -67,6 +71,9 @@ use Doma\EssentialsZ\kit\Categories;
 use Doma\EssentialsZ\kit\Kits;
 use Doma\EssentialsZ\listener\EssentialsEntityListener;
 use Doma\EssentialsZ\listener\EssentialsPlayerListener;
+use Doma\EssentialsZ\land\LandListener;
+use Doma\EssentialsZ\land\LandManager;
+use Doma\EssentialsZ\land\LandSettings;
 use Doma\EssentialsZ\rtl\RtlListener;
 use Doma\EssentialsZ\rtl\RtlProcessor;
 use Doma\EssentialsZ\rtl\RtlSettings;
@@ -89,6 +96,7 @@ class EssentialsZ extends PluginBase implements IEssentials{
 	private RandomTeleport $randomTeleport;
 	private ?EssentialsEconomy $economy = null;
 	private ?RtlProcessor $rtl = null;
+	private ?LandManager $land = null;
 
 	/** @var array<string, IEssentialsCommand> */
 	private array $commands = [];
@@ -102,6 +110,12 @@ class EssentialsZ extends PluginBase implements IEssentials{
 
 		$this->i18n = new I18n($this);
 		$this->i18n->onEnable();
+
+		// Fill in options added by an update before anything reads the config.
+		$added = ConfigUpdater::update($this->getResourcePath("config.yml"), $this->getDataFolder() . "config.yml");
+		if($added > 0){
+			$this->getLogger()->notice(I18n::tlLiteral("configUpdated", $added));
+		}
 
 		$this->settings = new Settings($this);
 		$this->i18n->updateLocale($this->settings->getLocale());
@@ -123,11 +137,17 @@ class EssentialsZ extends PluginBase implements IEssentials{
 		if($config->getBoolean("rtl.enabled", false)){
 			$this->rtl = new RtlProcessor(RtlSettings::fromConfig($config));
 		}
+		if($config->getBoolean("land.enabled", false)){
+			$this->land = new LandManager($this, LandSettings::fromConfig($config));
+		}
 
 		$this->permissionsHandler = new PermissionsHandler($this);
 		$this->permissionsHandler->registerPermissions();
 		if($this->economy !== null){
 			$this->permissionsHandler->registerEconomyPermissions();
+		}
+		if($this->land !== null){
+			$this->permissionsHandler->registerLandPermissions();
 		}
 
 		$this->registerCommands();
@@ -141,6 +161,9 @@ class EssentialsZ extends PluginBase implements IEssentials{
 		if($this->rtl !== null){
 			$pluginManager->registerEvents(new RtlListener($this->rtl), $this);
 		}
+		if($this->land !== null){
+			$pluginManager->registerEvents(new LandListener($this, $this->land), $this);
+		}
 
 		// Last, so listed commands can be removed no matter who registered them.
 		$missing = CommandDisabler::disable($this->getServer()->getCommandMap(), $config->getList("disabled-commands"));
@@ -152,6 +175,9 @@ class EssentialsZ extends PluginBase implements IEssentials{
 	protected function onDisable() : void{
 		if(isset($this->userMap)){
 			$this->userMap->shutdown();
+		}
+		if($this->land !== null){
+			$this->land->save();
 		}
 		if(isset($this->dataProvider)){
 			$this->dataProvider->close();
@@ -196,7 +222,7 @@ class EssentialsZ extends PluginBase implements IEssentials{
 					"egamemode", "gm", "egm",
 					"gma", "egma", "gmc", "egmc", "gms", "egms", "gmt", "egmt",
 					"survival", "esurvival", "survivalmode", "esurvivalmode",
-					"gmsp", "egmsp", "sp", "spec", "spectator"
+					"gmsp", "egmsp", "sp", "spec", "spectator", "gmv", "egmv"
 				]
 			],
 			[
@@ -244,6 +270,13 @@ class EssentialsZ extends PluginBase implements IEssentials{
 			$defs[] = [new Commandtakemoney(), ["etakemoney", "removemoney", "eremovemoney", "removebalance", "eremovebalance"]];
 			$defs[] = [new Commandsetmoney(), ["esetmoney", "setbalance", "esetbalance"]];
 			$defs[] = [new Commandmystatus(), ["emystatus", "status", "estatus"]];
+		}
+
+		if($this->land !== null){
+			$defs[] = [new Commandland(), ["eland", "claim", "eclaim"]];
+			$defs[] = [new Commandsetpos("startp", true), ["estartp", "setpos1"]];
+			$defs[] = [new Commandsetpos("endp", false), ["eendp", "setpos2"]];
+			$defs[] = [new Commandlandsell(), ["elandsell"]];
 		}
 
 		foreach($defs as [$command, $aliases]){
@@ -309,6 +342,13 @@ class EssentialsZ extends PluginBase implements IEssentials{
 	 */
 	public function getRtl() : ?RtlProcessor{
 		return $this->rtl;
+	}
+
+	/**
+	 * The land/claim API, or null when the land module is disabled.
+	 */
+	public function getLand() : ?LandManager{
+		return $this->land;
 	}
 
 	public function getSpawn() : Spawn{

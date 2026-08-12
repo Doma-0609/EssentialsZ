@@ -110,6 +110,24 @@ final class PermissionsHandler{
 		"essentialsz.setmoney" => "Allows setting a player's balance"
 	];
 
+	/**
+	 * @var array<string, string> node => description, registered only when the land
+	 * module is enabled. These are the everyday player commands, so they default to
+	 * everyone (like EconomyLand); the admin/bypass land nodes below default to ops.
+	 */
+	private const LAND_PLAYER_PERMISSIONS = [
+		"essentialsz.land" => "Allows access to the /land command",
+		"essentialsz.startp" => "Allows marking the first corner of a claim",
+		"essentialsz.endp" => "Allows marking the second corner of a claim",
+		"essentialsz.landsell" => "Allows selling a claim you own"
+	];
+
+	/** @var array<string, string> node => description, registered only when the land module is enabled */
+	private const LAND_PERMISSIONS = [
+		"essentialsz.land.bypass" => "Allows building in and interacting with any claim",
+		"essentialsz.land.limit.bypass" => "Bypasses the per-player claim limit"
+	];
+
 	public function __construct(private EssentialsZ $ess){}
 
 	public function registerPermissions() : void{
@@ -120,21 +138,27 @@ final class PermissionsHandler{
 		$this->registerAll(self::ECONOMY_PERMISSIONS);
 	}
 
+	public function registerLandPermissions() : void{
+		$this->registerAll(self::LAND_PLAYER_PERMISSIONS, DefaultPermissions::ROOT_USER);
+		$this->registerAll(self::LAND_PERMISSIONS);
+	}
+
 	/**
 	 * @param array<string, string> $permissions node => description
+	 * @param string $root the default group that grants these nodes (operators unless overridden)
 	 */
-	private function registerAll(array $permissions) : void{
+	private function registerAll(array $permissions, string $root = DefaultPermissions::ROOT_OPERATOR) : void{
 		$manager = PermissionManager::getInstance();
-		$operatorRoot = $manager->getPermission(DefaultPermissions::ROOT_OPERATOR);
-		if($operatorRoot === null){
-			throw new \RuntimeException("Operator root permission is not registered");
+		$rootPermission = $manager->getPermission($root);
+		if($rootPermission === null){
+			throw new \RuntimeException("Root permission \"$root\" is not registered");
 		}
 
 		foreach($permissions as $node => $description){
 			if($manager->getPermission($node) !== null){
 				continue; // already registered (e.g. after /essentials reload)
 			}
-			DefaultPermissions::registerPermission(new Permission($node, $description), [$operatorRoot]);
+			DefaultPermissions::registerPermission(new Permission($node, $description), [$rootPermission]);
 		}
 	}
 }

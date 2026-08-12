@@ -46,7 +46,7 @@ class EssentialsPlayerListener implements Listener{
 			}
 		}
 
-		if($player->hasPermission("essentialsz.vanish.onjoin")){
+		if($this->ess->getSettings()->isAutoVanish() && $player->hasPermission("essentialsz.vanish.onjoin")){
 			$event->setJoinMessage("");
 			$user->setVanished(true, false);
 			$user->sendTl("vanished");

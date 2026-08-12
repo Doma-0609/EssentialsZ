@@ -32,6 +32,8 @@ interface ISettings{
 
 	public function isWorldTimePermissions() : bool;
 
+	public function isAutoVanish() : bool;
+
 	public function getVanishFakeQuitMessage() : ?string;
 
 	public function getVanishFakeJoinMessage() : ?string;

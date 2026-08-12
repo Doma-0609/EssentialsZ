@@ -128,7 +128,7 @@ class Commandgamemode extends EssentialsLoopCommand{
 			return GameMode::SURVIVAL;
 		}elseif($modeString === "gma" || $modeString === "egma" || str_contains($modeString, "advent") || $modeString === "2" || $modeString === "a"){
 			return GameMode::ADVENTURE;
-		}elseif($modeString === "gmsp" || $modeString === "egmsp" || str_contains($modeString, "spec") || $modeString === "3" || $modeString === "sp"){
+		}elseif($modeString === "gmsp" || $modeString === "egmsp" || $modeString === "gmv" || $modeString === "egmv" || str_contains($modeString, "spec") || $modeString === "3" || $modeString === "sp" || $modeString === "v"){
 			return GameMode::SPECTATOR;
 		}elseif($modeString === "gmt" || $modeString === "egmt" || str_contains($modeString, "toggle") || str_contains($modeString, "cycle") || $modeString === "t"){
 			return null; // toggle: resolved against the player's current mode

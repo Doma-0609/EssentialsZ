@@ -6,6 +6,10 @@
 
 # EssentialsZ - the essential plugin suite for PocketMine-MP.
 
+# Do NOT edit. Tracks the config format so a plugin update can add any new
+# options to your file automatically (your old file is kept as config.yml.bak).
+config-version: 3
+
 ############################################################
 # +------------------------------------------------------+ #
 # |                    Essentials (Global)               | #
@@ -64,6 +68,11 @@ remove-effects-on-heal: true
 # When true, changing a world needs essentialsz.time.world.<world> (spaces
 # become underscores) or essentialsz.time.world.all.
 world-time-permissions: false
+
+# Should players with essentialsz.vanish.onjoin be vanished silently the
+# moment they join? Set to false to disable auto-vanish entirely (the
+# permission then does nothing at login).
+auto-vanish: true
 
 # The fake quit and join broadcasts sent when a player vanishes and
 # unvanishes. Set to "none" to use the server's own quit/join format.
@@ -149,6 +158,48 @@ rtl:
   # Reshape Persian/Arabic letters into their joined forms. Turn this off to
   # only flip the text order, leaving letter shapes as typed.
   shape: true
+
+############################################################
+# +------------------------------------------------------+ #
+# |                         Land                         | #
+# +------------------------------------------------------+ #
+############################################################
+
+land:
+  # Master switch for land claims (protecting a rectangular area you buy).
+  # When false the module does not exist at runtime: no /land command, no
+  # permissions and no protection listener. Changing it requires a restart.
+  # Buying a claim charges the economy, so leave the economy module on if
+  # you set a non-zero price; with the economy off, only free claims work.
+  enabled: false
+
+  # Cost of a claim = width x length x this. Set to 0 for free claims.
+  price-per-block: 10
+
+  # Smallest and largest side length (in blocks) a claim may have.
+  min-size: 1
+  max-size: 64
+
+  # How many claims one player may own. 0 = unlimited.
+  # essentialsz.land.limit.bypass ignores this.
+  max-per-player: 0
+
+  # Outline a claim with coloured particles on /land here
+  # (green = you may build, red = someone else's).
+  show-border: true
+
+  # May players teleport to a claim with /land move <number>?
+  allow-move: true
+
+  # Worlds where UNCLAIMED land is also protected - players can only build
+  # on land they own or are invited to.
+  protected-worlds: []
+
+  # Worlds skipped entirely by the protection listener (performance).
+  non-check-worlds: []
+
+  # Worlds in which claims cannot be bought.
+  buying-disallowed-worlds: []
 
 ############################################################
 # +------------------------------------------------------+ #

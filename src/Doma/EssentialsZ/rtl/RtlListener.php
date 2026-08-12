@@ -19,7 +19,6 @@ use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\SetTitlePacket;
 use pocketmine\network\mcpe\protocol\TextPacket;
-use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 
 final class RtlListener implements Listener{
 
@@ -37,7 +36,10 @@ final class RtlListener implements Listener{
             }
             if($packet instanceof SetScorePacket){
                 foreach ($packet->entries as $entry){
-                    $entry->customName = $this->processor->correct($entry->customName);
+                    // Removal and player/entity entries leave customName unset.
+                    if(isset($entry->customName)){
+                        $entry->customName = $this->processor->correct($entry->customName);
+                    }
                 }
                 return;
             }

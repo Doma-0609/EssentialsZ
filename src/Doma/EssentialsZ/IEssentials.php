@@ -19,6 +19,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use Doma\EssentialsZ\kit\Categories;
 use Doma\EssentialsZ\kit\Kits;
+use Doma\EssentialsZ\land\LandManager;
 use Doma\EssentialsZ\rtl\RtlProcessor;
 use Doma\EssentialsZ\session\User;
 use Doma\EssentialsZ\teleport\RandomTeleport;
@@ -53,6 +54,11 @@ interface IEssentials{
 	 * The right-to-left text API, or null when the RTL module is disabled.
 	 */
 	public function getRtl() : ?RtlProcessor;
+
+	/**
+	 * The land/claim API, or null when the land module is disabled.
+	 */
+	public function getLand() : ?LandManager;
 
 	public function getSpawn() : Spawn;
 

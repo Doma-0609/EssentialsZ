@@ -115,6 +115,24 @@ reversed, and the runs are swapped end for end, while Latin text, numbers, punct
 colour codes keep their position. A single packet hook covers chat and system messages
 alike. Letter reshaping can be turned off for order-only correction.
 
+### Land claims
+
+An optional land module lets players buy and protect a rectangular area. Turn it on with
+`land.enabled` (buying charges the economy, so keep the economy module on for paid claims).
+
+- **Buy** by marking two corners (`/land pos1`, `/land pos2`) and running `/land buy`. The
+  price is `width x length x price-per-block`, and `min-size` / `max-size` bound each side.
+- **Protection:** inside a claim, only the owner, invited players and holders of
+  `essentialsz.land.bypass` may break, place, interact or trample farmland. Containers are
+  protected by **their own position**, so a chest on a claim's edge can never be opened from
+  an adjacent unclaimed block.
+- **Manage** with `/land here|list|sell|invite <player>|kick <player>|invitee`, or open the
+  form UI with `/land`.
+- **Optimized:** claims are indexed by the world chunks they cover, so a per-block
+  protection check only scans the handful of claims in that chunk, not every claim.
+- `protected-worlds` also guards unclaimed land, `non-check-worlds` skips protection for
+  speed, and the API is reachable at `EssentialsZ::getLand()` (`land\LandManager`).
+
 ### Disabling commands
 
 Any command on the server can be removed by listing it under `disabled-commands`. This
