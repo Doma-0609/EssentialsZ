@@ -2,25 +2,25 @@
 
 **The essential plugin suite for PocketMine-MP 5.**
 
-Gamemodes, player toggles, teleportation, homes, warps, kits, an economy and
+Gamemodes, player toggles, teleportation, homes, warps, kits, an economy, land claims and
 right-to-left text support — in one plugin, with a clean developer API and no dependencies.
 
 ---
 
 ## Highlights
 
-- **36 commands and over 150 aliases**, all registered at runtime — nothing is declared in
+- **41 commands and over 160 aliases**, all registered at runtime — nothing is declared in
   `plugin.yml`, so labels never collide silently.
 - **Takes over vanilla commands.** `/gamemode` and `/tp` replace the built-in ones and
   still honour the built-in permissions, so existing rank setups keep working.
 - **One record per player.** Homes, balances, kit cooldowns and timestamps live in a
   single record backed by **JSON, SQLite or MySQL**.
-- **Fully optional modules.** The economy and RTL modules register *nothing* when
+- **Fully optional modules.** The economy, RTL and land modules register *nothing* when
   disabled — no commands, no permissions, no listeners, no database.
 - **Form UI everywhere it helps** — warps, kits, kit categories and payments — with an
   automatic text fallback when no form library is installed.
-- **413 translatable messages** in English and Persian, with optional per-player locale.
-- **Documented developer API** for the economy, storage and RTL layers.
+- **512 translatable messages** in English and Persian, with optional per-player locale.
+- **Documented developer API** for the economy, land, storage and RTL layers.
 
 ---
 
@@ -120,18 +120,27 @@ alike. Letter reshaping can be turned off for order-only correction.
 An optional land module lets players buy and protect a rectangular area. Turn it on with
 `land.enabled` (buying charges the economy, so keep the economy module on for paid claims).
 
-- **Buy** by marking two corners (`/land pos1`, `/land pos2`) and running `/land buy`. The
-  price is `width x length x price-per-block`, and `min-size` / `max-size` bound each side.
+- **Buy** by marking two corners — `/land pos1` and `/land pos2`, or the standalone
+  `/startp` and `/endp` — then running `/land buy`. The price is
+  `width x length x price-per-block`, and `min-size` / `max-size` bound each side while
+  `max-per-player` caps how many claims one player owns.
 - **Protection:** inside a claim, only the owner, invited players and holders of
   `essentialsz.land.bypass` may break, place, interact or trample farmland. Containers are
   protected by **their own position**, so a chest on a claim's edge can never be opened from
   an adjacent unclaimed block.
-- **Manage** with `/land here|list|sell|invite <player>|kick <player>|invitee`, or open the
-  form UI with `/land`.
+- **Access levels:** an invite is either *build* (full access) or *container* (open
+  containers only). Manage them with `/land invite <player>`, `/land kick <player>` and
+  `/land invitee`, or from the form UI.
+- **Border preview:** `/land here` outlines the claim you are standing in with coloured
+  particles (green where you may build, red otherwise); toggle with `show-border`.
+- **Manage** with `/land here|list|whose <keyword>|move <number>|give <player>|sell`, sell
+  from anywhere with `/landsell [here|number]`, or open the form UI with `/land`.
+  `/land move` teleports to a claim and can be switched off with `allow-move`.
 - **Optimized:** claims are indexed by the world chunks they cover, so a per-block
   protection check only scans the handful of claims in that chunk, not every claim.
 - `protected-worlds` also guards unclaimed land, `non-check-worlds` skips protection for
-  speed, and the API is reachable at `EssentialsZ::getLand()` (`land\LandManager`).
+  speed, `buying-disallowed-worlds` blocks purchases per world, and the API is reachable at
+  `EssentialsZ::getLand()` (`land\LandManager`).
 
 ### Disabling commands
 
@@ -239,13 +248,24 @@ Every command is registered at runtime. Only the primary aliases are listed.
 | `/takemoney <player> <amount>` | `removemoney`, `removebalance` | `essentialsz.takemoney` |
 | `/setmoney <player> <amount>` | `setbalance` | `essentialsz.setmoney` |
 
+### Land — registered only while the land module is enabled
+
+| Command | Aliases | Permission |
+|---|---|---|
+| `/land [pos1\|pos2\|buy\|here\|list\|whose\|move\|give\|sell\|invite\|kick\|invitee]` | `eland`, `claim`, `eclaim` | `essentialsz.land` |
+| `/startp` | `estartp`, `setpos1` | `essentialsz.startp` |
+| `/endp` | `eendp`, `setpos2` | `essentialsz.endp` |
+| `/landsell [here\|number]` | `elandsell` | `essentialsz.landsell` |
+
 ---
 
 ## Permissions
 
-**66 permission nodes** are registered in code (plus **9** more while the economy is
-enabled), all defaulting to operators — grant them with any permission plugin. Nothing is
-declared in `plugin.yml`.
+**69 permission nodes** are registered in code (plus **9** more while the economy is
+enabled and **6** while land is enabled). Most default to operators — grant them with any
+permission plugin. The four everyday land commands (`/land`, `/startp`, `/endp`,
+`/landsell`) default to **everyone**, while the land bypass nodes stay operator-only.
+Nothing is declared in `plugin.yml`.
 
 Naming follows a predictable pattern:
 
@@ -261,6 +281,7 @@ Naming follows a predictable pattern:
 | `essentialsz.kits.<name>` | Claim a specific kit *(registered per kit)* |
 | `essentialsz.category.<name>` | View a specific kit category |
 | `essentialsz.kit.exemptdelay` | Ignore kit cooldowns |
+| `essentialsz.land.bypass` · `.limit.bypass` | Build in any claim / ignore the per-player claim limit |
 
 Commands that replace a vanilla one also accept the vanilla permission:
 `/gamemode` honours `pocketmine.command.gamemode.self` / `.other`, and `/tp` honours
@@ -275,10 +296,11 @@ Commands that replace a vanilla one also accept the vanilla permission:
 | Group | Options |
 |---|---|
 | General | `locale`, `per-player-locale`, `debug`, `verbose-command-usages`, `disabled-commands` |
-| Players | `max-fly-speed`, `max-walk-speed`, `remove-effects-on-heal`, `vanish-fake-quit-message`, `vanish-fake-join-message` |
+| Players | `max-fly-speed`, `max-walk-speed`, `remove-effects-on-heal`, `world-time-permissions`, `auto-vanish`, `vanish-fake-quit-message`, `vanish-fake-join-message` |
 | Teleports | `tpa-accept-cancellation`, `back-death-time-limit`, `max-homes`, `random-teleport.*` |
 | Economy | `enabled`, `start-money`, `max-money`, `currency-symbol`, `decimals`, `allow-pay-offline`, `min-pay-amount` |
 | RTL | `enabled`, `shape` |
+| Land | `enabled`, `price-per-block`, `min-size`, `max-size`, `max-per-player`, `show-border`, `allow-move`, `protected-worlds`, `non-check-worlds`, `buying-disallowed-worlds` |
 | Storage | `provider`, `mysql.*`, `user-storage-key` |
 
 Turning a module off is a single line, and the module then registers nothing at all:
@@ -289,13 +311,16 @@ economy:
 
 rtl:
   enabled: false   # no processor and no packet listener
+
+land:
+  enabled: false   # no land commands, permissions or protection listener
 ```
 
 ---
 
 ## Developer API
 
-Both optional modules return `null` while disabled — always null-check.
+Every optional module returns `null` while disabled — always null-check.
 
 ### Economy
 
@@ -334,6 +359,22 @@ if($rtl !== null && $rtl->hasRtl($text)){
 }
 ```
 
+### Land
+
+```php
+$land = $essentials->getLand();
+if($land === null){
+    return; // the land module is disabled
+}
+
+$pos   = $player->getPosition();
+$world = $pos->getWorld()->getFolderName();
+$claim = $land->getLandAt($world, $pos->getFloorX(), $pos->getFloorZ()); // ?land\Land
+if($claim !== null && !$land->canBuild($player, $world, $pos->getFloorX(), $pos->getFloorZ())){
+    // player may not build where they are standing
+}
+```
+
 ### Storage
 
 Read and write your own fields on the shared player record, or plug in a custom backend
@@ -349,7 +390,6 @@ $data->save();
 
 ## TODO
 - ### Moderation
-- ### Land (Claim) system
 - ### Rank System or Group System maybe?
 - ### Anything that you think is useful
 
