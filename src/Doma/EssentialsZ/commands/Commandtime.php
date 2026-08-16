@@ -53,6 +53,10 @@ class Commandtime extends EssentialsCommand{
 			}
 			// /day and /night (and their e-prefixed forms) set the time directly
 			$ticks = TickFormat::parse(str_replace("e", "", $label));
+		}elseif(self::isFlowKeyword(mb_strtolower($args[0]))){
+			// /time stop|start [world] freezes or resumes the daylight cycle
+			$this->toggleTimeFlow($server, $sender, mb_strtolower($args[0]), $args[1] ?? null);
+			return;
 		}elseif(count($args) === 1){
 			$worlds = $this->getWorlds($server, $sender, null);
 			$ticks = self::parseTime($args[0]);
@@ -84,6 +88,39 @@ class Commandtime extends EssentialsCommand{
 			$names[] = $world->getDisplayName();
 		}
 		$sender->sendTl($add ? "timeWorldAdd" : "timeWorldSet", TickFormat::formatTicks($ticks), implode(", ", $names));
+	}
+
+	private static function isFlowKeyword(string $word) : bool{
+		return $word === "stop" || $word === "freeze" || $word === "start" || $word === "resume" || $word === "unfreeze";
+	}
+
+	/**
+	 * /time stop (freeze/…) halts the daylight cycle; /time start (resume/…)
+	 * lets it advance again. Both accept an optional world selector.
+	 */
+	private function toggleTimeFlow(Server $server, CommandSource $sender, string $keyword, ?string $selector) : void{
+		$stop = $keyword === "stop" || $keyword === "freeze";
+		$worlds = $this->getWorlds($server, $sender, $selector);
+
+		if(!$this->canSetTime($sender)){
+			throw new TranslatableException("timeSetPermission");
+		}
+		foreach($worlds as $world){
+			if(!$this->canUpdateWorld($sender, $world)){
+				throw new TranslatableException("timeSetWorldPermission", $world->getDisplayName());
+			}
+		}
+
+		$names = [];
+		foreach($worlds as $world){
+			if($stop){
+				$world->stopTime();
+			}else{
+				$world->startTime();
+			}
+			$names[] = $world->getDisplayName();
+		}
+		$sender->sendTl($stop ? "timeWorldStopped" : "timeWorldStarted", implode(", ", $names));
 	}
 
 	/**
