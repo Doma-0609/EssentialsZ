@@ -33,6 +33,9 @@ use Doma\EssentialsZ\commands\Commandlandsell;
 use Doma\EssentialsZ\commands\Commandsetpos;
 use Doma\EssentialsZ\commands\Commandmystatus;
 use Doma\EssentialsZ\commands\Commandpay;
+use Doma\EssentialsZ\commands\Commandrepair;
+use Doma\EssentialsZ\commands\Commandscale;
+use Doma\EssentialsZ\commands\Commandspider;
 use Doma\EssentialsZ\commands\Commandsetmoney;
 use Doma\EssentialsZ\commands\Commandtakemoney;
 use Doma\EssentialsZ\commands\Commandsethome;
@@ -238,6 +241,9 @@ class EssentialsZ extends PluginBase implements IEssentials{
 				["flyspeed", "eflyspeed", "fspeed", "efspeed", "espeed", "walkspeed", "ewalkspeed", "wspeed", "ewspeed"]
 			],
 			[new Commandvanish(), ["v", "ev", "evanish"]],
+			[new Commandscale(), ["escale", "size", "esize"]],
+			[new Commandspider(), ["espider", "climb", "eclimb"]],
+			[new Commandrepair(), ["erepair", "fix", "efix"]],
 			[new Commandafk(), ["eafk", "away", "eaway"]],
 			[new Commandtpa(), ["call", "ecall", "etpa", "tpask", "etpask"]],
 			[new Commandtpaccept(), ["etpaccept", "tpyes", "etpyes"]],

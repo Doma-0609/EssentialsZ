@@ -63,10 +63,13 @@ class Commandtp extends EssentialsCommand{
 				break;
 			default:
 				$this->checkOthersPermission($user);
-				$target = $this->getPlayer($server, $user->getSource(), $args[0]);
 				$toPlayer = $this->getPlayer($server, $user->getSource(), $args[1]);
-				$target->sendTl("teleportAtoB", $user->getDisplayName(), $toPlayer->getDisplayName());
-				$target->getBase()->teleport($toPlayer->getBase()->getLocation());
+				$destination = $toPlayer->getBase()->getLocation();
+				// args[0] may be a selector such as @a, bringing every match.
+				foreach($this->matchTargets($server, $user->getSource(), $args[0]) as $target){
+					$target->sendTl("teleportAtoB", $user->getDisplayName(), $toPlayer->getDisplayName());
+					$target->getBase()->teleport($destination);
+				}
 				break;
 		}
 	}
@@ -76,12 +79,16 @@ class Commandtp extends EssentialsCommand{
 			throw new NotEnoughArgumentsException();
 		}
 
-		$target = $this->getPlayer($server, $sender, $args[0]);
 		if(count($args) === 2){
 			$toPlayer = $this->getPlayer($server, $sender, $args[1]);
-			$target->sendTl("teleportAtoB", $sender->getDisplayName(), $toPlayer->getDisplayName());
-			$target->getBase()->teleport($toPlayer->getBase()->getLocation());
+			$destination = $toPlayer->getBase()->getLocation();
+			// args[0] may be a selector such as @a, bringing every match.
+			foreach($this->matchTargets($server, $sender, $args[0]) as $target){
+				$target->sendTl("teleportAtoB", $sender->getDisplayName(), $toPlayer->getDisplayName());
+				$target->getBase()->teleport($destination);
+			}
 		}elseif(count($args) > 3){
+			$target = $this->getPlayer($server, $sender, $args[0]);
 			$location = $target->getBase()->getLocation();
 			$x = self::parseCoordinate($args[1], $location->x);
 			$y = self::parseCoordinate($args[2], $location->y);

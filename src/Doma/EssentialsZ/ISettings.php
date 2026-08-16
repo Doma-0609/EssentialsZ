@@ -28,6 +28,10 @@ interface ISettings{
 
 	public function getMaxWalkSpeed() : float;
 
+	public function getScaleMin() : float;
+
+	public function getScaleMax() : float;
+
 	public function isRemovingEffectsOnHeal() : bool;
 
 	public function isWorldTimePermissions() : bool;

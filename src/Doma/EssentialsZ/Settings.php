@@ -16,6 +16,7 @@ use Doma\EssentialsZ\config\EssentialsConfiguration;
 use Doma\EssentialsZ\session\UserStorageKey;
 use pocketmine\utils\TextFormat;
 use function in_array;
+use function max;
 use function strtolower;
 
 class Settings implements ISettings{
@@ -28,6 +29,8 @@ class Settings implements ISettings{
 	private bool $verboseCommandUsages = true;
 	private float $maxFlySpeed = 0.4;
 	private float $maxWalkSpeed = 0.4;
+	private float $scaleMin = 0.1;
+	private float $scaleMax = 10.0;
 	private bool $removeEffectsOnHeal = true;
 	private bool $worldTimePermissions = false;
 	private bool $autoVanish = true;
@@ -55,6 +58,8 @@ class Settings implements ISettings{
 		$this->verboseCommandUsages = $this->config->getBoolean("verbose-command-usages", true);
 		$this->maxFlySpeed = $this->config->getDouble("max-fly-speed", 0.4);
 		$this->maxWalkSpeed = $this->config->getDouble("max-walk-speed", 0.4);
+		$this->scaleMin = max(0.01, $this->config->getDouble("scale-min", 0.1));
+		$this->scaleMax = max($this->scaleMin, $this->config->getDouble("scale-max", 10.0));
 		$this->removeEffectsOnHeal = $this->config->getBoolean("remove-effects-on-heal", true);
 		$this->worldTimePermissions = $this->config->getBoolean("world-time-permissions", false);
 		$this->autoVanish = $this->config->getBoolean("auto-vanish", true);
@@ -102,6 +107,14 @@ class Settings implements ISettings{
 
 	public function getMaxWalkSpeed() : float{
 		return $this->maxWalkSpeed;
+	}
+
+	public function getScaleMin() : float{
+		return $this->scaleMin;
+	}
+
+	public function getScaleMax() : float{
+		return $this->scaleMax;
 	}
 
 	public function isRemovingEffectsOnHeal() : bool{

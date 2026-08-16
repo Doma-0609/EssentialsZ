@@ -8,7 +8,7 @@
 
 # Do NOT edit. Tracks the config format so a plugin update can add any new
 # options to your file automatically (your old file is kept as config.yml.bak).
-config-version: 3
+config-version: 4
 
 ############################################################
 # +------------------------------------------------------+ #
@@ -60,6 +60,11 @@ max-fly-speed: 0.4
 # The maximum walk speed /speed may set, in engine units.
 # The engine default walk speed is 0.1; /speed 10 reaches this cap.
 max-walk-speed: 0.4
+
+# Smallest and largest body size /scale may set. 1.0 is the normal player
+# size; the command clamps any number into this range.
+scale-min: 0.1
+scale-max: 10.0
 
 # Should /heal also remove all active potion effects?
 remove-effects-on-heal: true
