@@ -21,6 +21,64 @@ see [Vanilla fallback permissions](#vanilla-fallback-permissions).
 
 ---
 
+## Commands & aliases
+
+Each command answers to its primary label **and** every alias listed here (most
+also have an `e`-prefixed twin to avoid clashing with other plugins). The
+permission is tied to the command, so any alias needs the same node.
+
+| Command | Aliases |
+|---|---|
+| `/gamemode` | `/gm` `/gmc` `/gms` `/gma` `/gmsp` `/gmv` `/gmt` `/creative` `/survival` `/adventure` `/spectator` `/sp` `/spec` `/creativemode` `/survivalmode` `/adventuremode` (+ `e`-prefixed forms) |
+| `/essentials` | `/ess` `/essz` `/essversion` `/essentialsz` (+ `e`-prefixed forms) |
+| `/fly` | `/efly` |
+| `/god` | `/godmode` `/tgm` (+ `e`-prefixed forms) |
+| `/heal` | `/eheal` |
+| `/feed` | `/eat` (+ `e`-prefixed forms) |
+| `/speed` | `/fspeed` `/wspeed` `/flyspeed` `/walkspeed` (+ `e`-prefixed forms) |
+| `/scale` | `/size` (+ `e`-prefixed forms) |
+| `/spider` | `/climb` (+ `e`-prefixed forms) |
+| `/repair` | `/fix` (+ `e`-prefixed forms) |
+| `/vanish` | `/v` (+ `e`-prefixed forms) |
+| `/afk` | `/away` (+ `e`-prefixed forms) |
+| `/tpa` | `/call` `/tpask` (+ `e`-prefixed forms) |
+| `/tpaccept` | `/tpyes` (+ `e`-prefixed forms) |
+| `/tpahere` | `/etpahere` |
+| `/tpdeny` | `/tpno` (+ `e`-prefixed forms) |
+| `/back` | `/return` (+ `e`-prefixed forms) |
+| `/spawn` | `/espawn` |
+| `/setspawn` | `/esetspawn` |
+| `/tpr` | `/rtp` `/tprandom` (+ `e`-prefixed forms) |
+| `/tp` | `/teleport` `/tele` `/tp2p` (+ `e`-prefixed forms) |
+| `/tphere` | `/s` `/etphere` |
+| `/tppos` | `/etppos` |
+| `/tpo` | `/etpo` |
+| `/home` | `/homes` (+ `e`-prefixed forms) |
+| `/sethome` | `/createhome` (+ `e`-prefixed forms) |
+| `/delhome` | `/remhome` `/rmhome` (+ `e`-prefixed forms) |
+| `/warp` | `/warps` (+ `e`-prefixed forms) |
+| `/setwarp` | `/createwarp` (+ `e`-prefixed forms) |
+| `/delwarp` | `/remwarp` `/rmwarp` (+ `e`-prefixed forms) |
+| `/kit` | `/kits` (+ `e`-prefixed forms) |
+| `/time` | `/day` `/night` (+ `e`-prefixed forms) |
+| `/balance` | `/bal` `/money` `/seemoney` (+ `e`-prefixed forms) |
+| `/pay` | `/epay` |
+| `/balancetop` | `/baltop` `/rich` `/topmoney` (+ `e`-prefixed forms) |
+| `/eco` | `/economy` (+ `e`-prefixed forms) |
+| `/givemoney` | `/addmoney` `/addbalance` (+ `e`-prefixed forms) |
+| `/takemoney` | `/removemoney` `/removebalance` (+ `e`-prefixed forms) |
+| `/setmoney` | `/setbalance` (+ `e`-prefixed forms) |
+| `/mystatus` | `/status` (+ `e`-prefixed forms) |
+| `/land` | `/claim` `/eland` `/eclaim` |
+| `/startp` | `/setpos1` `/estartp` |
+| `/endp` | `/setpos2` `/eendp` |
+| `/landsell` | `/elandsell` |
+
+In the permission tables below the **Command** column shows the primary label
+(and its most useful aliases); any alias from this section works the same.
+
+---
+
 ## General
 
 | Permission | Default | Command | What it does |
@@ -49,11 +107,11 @@ see [Vanilla fallback permissions](#vanilla-fallback-permissions).
 | `essentialsz.heal.others` | op | `/heal <player>` | Heal other players |
 | `essentialsz.feed` | op | `/feed` | Feed yourself |
 | `essentialsz.feed.others` | op | `/feed <player>` | Feed other players |
-| `essentialsz.speed` | op | `/speed` | Change your move/fly speed |
+| `essentialsz.speed` | op | `/speed` · `/fspeed` · `/wspeed` | Change your move/fly speed |
 | `essentialsz.speed.others` | op | `/speed … <player>` | Change another player's speed |
-| `essentialsz.speed.fly` | op | `/speed` | Change the **fly** speed |
-| `essentialsz.speed.walk` | op | `/speed` | Change the **walk** speed |
-| `essentialsz.speed.bypass` | op | `/speed` | Ignore the configured speed caps |
+| `essentialsz.speed.fly` | op | `/speed fly` · `/fspeed` · `/flyspeed` | Change the **fly** speed |
+| `essentialsz.speed.walk` | op | `/speed walk` · `/wspeed` · `/walkspeed` | Change the **walk** speed |
+| `essentialsz.speed.bypass` | op | `/speed` `/fspeed` `/wspeed` | Ignore the configured speed caps |
 | `essentialsz.scale` | op | `/scale` | Resize your own body |
 | `essentialsz.scale.others` | op | `/scale <size> <player>` | Resize other players |
 | `essentialsz.spider` | op | `/spider` | Toggle wall climbing on yourself |
